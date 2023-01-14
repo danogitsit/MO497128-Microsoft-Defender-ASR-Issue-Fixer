@@ -1,7 +1,5 @@
 # MO497128-Microsoft-Defender-ASR-Issue-Fixer
-Interactive shortcut recreator PowerShell script to recreate shortcuts based on installed applications to support resolution of the Microsoft Defender ASR issue
-
-Two PowerShell scripts are provided to support the recovery of shortcuts deleted as part of the MO497128 Defender issue.
+PowerShell scripts to help recreate shortcuts as a result of the Microsoft Defender ASR issue.
 
 ## recover-shortcuts.ps1
 This script uses Microsoft Defender events stored in Windows (Event Viewer) in an attempt to recover the shortcuts. This script does not completely recreate the shortcuts as they were as the events generated do not store information such as shortcut icon, parent path. The script must be run in the users context, the user must have read access to event viewer (usually do). This script should be used as an attempt #1 but you may be better of going straight to the next script.
