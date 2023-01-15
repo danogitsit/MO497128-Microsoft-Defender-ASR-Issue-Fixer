@@ -6,7 +6,7 @@ This script uses Microsoft Defender events stored in Windows (Event Viewer) in a
 
 Copy this script to a file on your computer called "recover-shortcuts.ps1" then, open PowerShell, use cd "C:\somedirectory\someplace\recover-shortcuts.ps1", then;
 
-**Note. The change to Microsoft Defender rule to audit should be in place before you run this or Defender will just delete shortcuts again**
+**Note. The change to Microsoft Defender rule to audit should be in place or your tenant should have recieved the Microsoft fix before you run this or Defender will just delete shortcuts again. PowerShell Constrained Language Mode not supported due to dependency on COM objects for shortcut generation.**
 
 > .\recover-shortcuts.ps1
 
@@ -15,6 +15,6 @@ This script uses information in the registry to identify programs in which to re
 
 Copy this script to a file on your computer called "generate-shortcutsinteractive.ps1" then, open PowerShell, use cd "C:\somedirectory\someplace\recover-shortcuts.ps1", then;
 
-**Note. The change to Microsoft Defender rule to audit should be in place before you run this or Defender will just delete shortcuts again**
+**Note. The change to Microsoft Defender rule to audit should be in place or your tenant should have recieved the Microsoft fix  before you run this or Defender will just delete shortcuts again. PowerShell Constrained Language Mode not supported due to dependency on COM objects for shortcut generation.**
 
 > .\generate-shortcutsinteractive.ps1
