@@ -19,6 +19,13 @@
 #>
 
 
+# Use custom app shortcuts to include known apps not listed in the reg key HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\
+# Option will only appear if EXE can be located on machine script is being executed
+
+$customAppShortcuts = @{Name="Citrix Workspace"; Group=""; Path="$(${env:ProgramFiles(x86)})\Citrix\ICA Client\SelfServicePlugin\SelfService.exe"},
+                      @{Name="Remote Desktop"; Group="Microsoft Remote Desktop"; Path="$($env:ProgramFiles)\Remote Desktop\msrdcw.exe"}
+                      
+
 $appPathsRoot = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\"
 $appPaths = get-childitem -path $appPathsRoot
 
@@ -73,6 +80,30 @@ $results = foreach($aPath in $appPaths){
 
 $resultsGroup = $results | Group-Object Product
 
+# Check custom app shortcuts
+
+if($customAppShortcuts){
+
+    foreach($customApp in $customAppShortcuts){
+
+        if(Test-Path $customApp.Path){
+
+            $groupObj = New-Object -TypeName PSObject -Property @{
+                Count=1
+                Name=[string]$customApp.Name
+                Group=new-object -typeName PSobject -Property @{
+                    Path=$customApp.Path
+                    Directory=$customApp.Path.Substring(0,$customApp.Path.LastIndexOf("\"))
+                    Product=$customApp.Group
+                    Name=$customApp.Name
+                }
+            }
+
+            $resultsGroup += $groupObj
+        }
+    }
+}
+
 foreach($resultGroup in $resultsGroup){
 
     do{
@@ -100,10 +131,10 @@ foreach($resultGroup in $resultsGroup){
 
             foreach($shortcut in $resultGroup.Group){
 
-                  $shortcutDir = $env:APPDATA+"\Microsoft\Windows\Start Menu\Programs\$($resultGroup.Name)\"
-                  if (!(test-path $shortcutDir)){new-item -itemtype Directory -path $($env:APPDATA+"\Microsoft\Windows\Start Menu\Programs\") -Name $resultGroup.Name | out-null}
+                  $shortcutDir = $env:APPDATA+"\Microsoft\Windows\Start Menu\Programs\$($shortcut.Product)\"
+                  if (!(test-path $shortcutDir)){new-item -itemtype Directory -path $($env:APPDATA+"\Microsoft\Windows\Start Menu\Programs\") -Name $shortcut.Product| out-null}
 
-                  $shortcutPath = $env:APPDATA+"\Microsoft\Windows\Start Menu\Programs\$($resultGroup.Name)\$($shortcut.Name.Trim()).lnk"
+                  $shortcutPath = $env:APPDATA+"\Microsoft\Windows\Start Menu\Programs\$($shortcut.Product)\$($shortcut.Name.Trim()).lnk"
                   write-host "Result: Creating shortcut in Start Menu ($shortcutPath) to $($shortcut.Path)"
                   createShortcut $shortcutPath $shortcut.Path
             }    
@@ -119,10 +150,10 @@ foreach($resultGroup in $resultsGroup){
         3{
             foreach($shortcut in $resultGroup.Group){
 
-                  $shortcutDir = $env:APPDATA+"\Microsoft\Windows\Start Menu\Programs\$($resultGroup.Name)\"
-                  if (!(test-path $shortcutDir)){new-item -itemtype Directory -path $($env:APPDATA+"\Microsoft\Windows\Start Menu\Programs\") -Name $resultGroup.Name | out-null}
+                  $shortcutDir = $env:APPDATA+"\Microsoft\Windows\Start Menu\Programs\$($shortcut.Product)\"
+                  if (!(test-path $shortcutDir)){new-item -itemtype Directory -path $($env:APPDATA+"\Microsoft\Windows\Start Menu\Programs\") -Name $shortcut.Product | out-null}
 
-                  $shortcutPathStart = $env:APPDATA+"\Microsoft\Windows\Start Menu\Programs\$($resultGroup.Name)\$($shortcut.Name.Trim()).lnk"
+                  $shortcutPathStart = $env:APPDATA+"\Microsoft\Windows\Start Menu\Programs\$($shortcut.Product)\$($shortcut.Name.Trim()).lnk"
                   $shortcutPathDesk = [Environment]::GetFolderPath("Desktop")+"\$($shortcut.Name.Trim()).lnk"
                   write-host "Result: Creating shortcut in Start Menu & Desktop ($shortcutPathStart), ($shortcutPathDesk ) to $($shortcut.Path)"
                   
@@ -134,7 +165,7 @@ foreach($resultGroup in $resultsGroup){
 
     }
 
-    start-sleep -Seconds 2
+    start-sleep -Seconds 1
 
     cls
 
